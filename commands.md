@@ -13,8 +13,8 @@ git commit -am 'start assessment'
 echo -n ".terraform\n.terraform.lock.hcl\nterraform.tfstate*\n.*-key-pair*\n" > .gitignore
 ssh-keygen -t rsa -f .terraform-aws-demo-architecture-key-pair
 
-mkdir -p modules/{app-aws-vpc,app-aws-subnets,app-aws-key-pair,app-aws-private-instances,app-aws-public-instances,app-aws-security-groups,app-aws-database,app-aws-lambda-functions}
-touch modules/{app-aws-vpc,app-aws-subnets,app-aws-key-pair,app-aws-private-instances,app-aws-public-instances,app-aws-security-groups,app-aws-database,app-aws-lambda-functions}/{main.tf,output.tf,vars.tf} main.tf
+mkdir -p modules/{app-aws-vpc,app-aws-subnets,app-aws-key-pair,app-aws-private-instances,app-aws-public-instances,app-aws-security-groups,app-aws-igw,app-aws-route-table,app-aws-database,app-aws-lambda-functions}
+touch modules/{app-aws-vpc,app-aws-subnets,app-aws-key-pair,app-aws-private-instances,app-aws-public-instances,app-aws-security-groups,app-aws-igw,app-aws-route-table,app-aws-database,app-aws-lambda-functions}/{main.tf,output.tf,vars.tf} main.tf
 
 ```
 
@@ -28,6 +28,7 @@ Repeat these commands as developing the code and follow the error trail
 
 ```sh
 terraform init && terraform plan
+terraform init && terraform destroy -auto-approve && terraform plan && terraform apply -auto-approve
 ```
 
 or this one if you have s3 backend configured

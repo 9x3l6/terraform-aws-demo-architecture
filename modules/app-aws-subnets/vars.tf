@@ -4,14 +4,9 @@ variable "app-aws-subnet-public-name" {
   default = "terraform-demo-architecture-public-subnet"
 }
 
-variable "app-aws-subnet-public-az" {
-  description = "Public subnet Availability Zone"
-  default = "us-east-1"
-}
-
 variable "app-aws-subnet-public-cidr-block" {
   description = "Public subnet CIDR range"
-  default = "10.0.1.0/24"
+  default = "10.42.0.0/24"
 }
 
 # Private subnet
@@ -20,14 +15,9 @@ variable "app-aws-subnet-private-name" {
   default = "terraform-demo-architecture-private-subnet"
 }
 
-variable "app-aws-subnet-private-az" {
-  description = "Private subnet Availability Zone"
-  default = "us-east-1"
-}
-
 variable "app-aws-subnet-private-cidr-block" {
   description = "Private subnet CIDR range"
-  default = "10.0.10.0/24"
+  default = "10.42.1.0/24"
 }
 
 # Database subnet
@@ -36,12 +26,7 @@ variable "app-aws-subnet-database-name" {
   default = "terraform-demo-architecture-database-subnet"
 }
 
-variable "app-aws-subnet-database-az" {
-  description = "Database subnet Availability Zone"
-  default = "us-east-1"
-}
-
 variable "app-aws-subnet-database-cidr-block" {
   description = "Database subnet CIDR range"
-  default = "10.0.100.0/24"
+  default = "10.42.2.0/24"
 }

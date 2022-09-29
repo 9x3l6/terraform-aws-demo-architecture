@@ -4,7 +4,7 @@ module "aws-vpc" {
 
 resource "aws_security_group" "app-aws-private-security-group" {
   name = var.app-aws-private-security-group-name  # "private-sg-terraform-demo-architecture"
-  vpc_id = module.aws-vpc.app_aws_vpc_id
+  vpc_id = module.aws-vpc.app_aws_vpc.id
   
   egress {
     from_port = 0
@@ -16,7 +16,7 @@ resource "aws_security_group" "app-aws-private-security-group" {
 
 resource "aws_security_group" "app-aws-public-security-group" {
   name = var.app-aws-public-security-group-name  # "public-sg-terraform-demo-architecture"
-  vpc_id = module.aws-vpc.app_aws_vpc_id
+  vpc_id = module.aws-vpc.app_aws_vpc.id
 
   # Allow access to bastion host from anywhere in the world by default
   ingress {
