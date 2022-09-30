@@ -43,12 +43,25 @@ output "app_aws_route_table_association" {
   value = aws_route_table_association.app-aws-route-table-association
 }
 
-# public SG
-output "app_aws_sg_public" {
-  value = aws_security_group.app-aws-public-security-group
+# security groups
+output "app_aws_public_ssh_security_group" {
+  value = aws_security_group.app-aws-public-ssh-security-group
+}
+output "app_aws_private_ssh_security_group" {
+  value = aws_security_group.app-aws-private-ssh-security-group
 }
 
-# private SG
-output "app_aws_sg_private" {
+output "app_aws_private_security_group" {
   value = aws_security_group.app-aws-private-security-group
+}
+
+output "app_aws_database_security_group" {
+  value = aws_security_group.app-aws-database-security-group
+}
+
+output "app_aws_private_web_security_group" {
+  value = aws_security_group.app-aws-private-web-security-group
+}
+output "app_aws_public_web_security_group" {
+  value = aws_security_group.app-aws-public-web-security-group
 }

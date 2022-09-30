@@ -70,18 +70,22 @@ variable "app-aws-route-table-name" {
 }
 
 # Security groups
-variable "app-aws-public-security-group-name" {
-  description = "Public Security Group name"
-  default = "public-sg-terraform-demo-architecture"
+variable "app-aws-public-ssh-security-group-name" {
+  description = "Public SSH Security Group name"
+  default = "public-ssh-sg-terraform-demo-architecture"
 }
-variable "app-aws-public-security-group-description" {
-  description = "Public Security Group description"
-  default = "Public Security Group"
+variable "app-aws-public-ssh-security-group-description" {
+  description = "Public SSH Security Group description"
+  default = "Public SSH Security Group"
 }
 
-variable "app-aws-public-security-group-cidr-blocks" {
-  description = "CIDR range to allow for SSH access for connecting to bastion host"
-  default = ["0.0.0.0/0"]
+variable "app-aws-private-ssh-security-group-name" {
+  description = "Private SSH Security Group name"
+  default = "private-ssh-sg-terraform-demo-architecture"
+}
+variable "app-aws-private-ssh-security-group-description" {
+  description = "Private SSH Security Group description"
+  default = "Private SSH Security Group"
 }
 
 variable "app-aws-private-security-group-name" {

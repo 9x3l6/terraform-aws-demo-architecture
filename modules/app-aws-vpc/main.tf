@@ -124,7 +124,7 @@ resource "aws_route_table_association" "app-aws-route-table-association" {
 }
 
 # Security groups
-resource "aws_security_group" "app-aws-public-security-group" {
+resource "aws_security_group" "app-aws-public-ssh-security-group" {
   depends_on = [
     aws_vpc.app-aws-vpc,
     aws_subnet.app-aws-subnet-private,
@@ -133,15 +133,15 @@ resource "aws_security_group" "app-aws-public-security-group" {
   ]
 
   vpc_id = aws_vpc.app-aws-vpc.id
-  name = var.app-aws-public-security-group-name  # "public-sg-terraform-demo-architecture"
-  description = var.app-aws-public-security-group-description
+  name = var.app-aws-public-ssh-security-group-name  # "public-sg-terraform-demo-architecture"
+  description = var.app-aws-public-ssh-security-group-description
 
   # Allow access to bastion host from anywhere in the world by default
   ingress {
     from_port = 22
     to_port = 22
     protocol = "tcp"
-    cidr_blocks = var.app-aws-public-security-group-cidr-blocks # ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -149,7 +149,43 @@ resource "aws_security_group" "app-aws-public-security-group" {
     from_port   = 0
     to_port     = 0
     protocol    = "ICMP"
-    cidr_blocks = var.app-aws-public-security-group-cidr-blocks # ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "app-aws-private-ssh-security-group" {
+  depends_on = [
+    aws_vpc.app-aws-vpc,
+    aws_subnet.app-aws-subnet-private,
+    aws_subnet.app-aws-subnet-public,
+    aws_subnet.app-aws-subnet-database,
+  ]
+
+  vpc_id = aws_vpc.app-aws-vpc.id
+  name = var.app-aws-private-ssh-security-group-name  # "private-ssh-sg-terraform-demo-architecture"
+  description = var.app-aws-private-ssh-security-group-description
+
+  # Allow access to other ssh servers from bastion host
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    security_groups = [aws_security_group.app-aws-public-ssh-security-group.id]
+  }
+
+  ingress {
+    description = "Ping"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "ICMP"
+    security_groups = [aws_security_group.app-aws-public-ssh-security-group.id]
   }
 
   egress {
@@ -173,11 +209,10 @@ resource "aws_security_group" "app-aws-private-security-group" {
   description = var.app-aws-private-security-group-description
 
   ingress {
-    description = "Ping"
     from_port   = 0
     to_port     = 0
-    protocol    = "ICMP"
-    security_groups = [aws_security_group.app-aws-public-security-group.id] # so can ping servers from bastion host
+    protocol    = "-1"
+    security_groups = [aws_security_group.app-aws-public-ssh-security-group.id]
   }
 
   egress {
@@ -216,7 +251,7 @@ resource "aws_security_group" "app-aws-database-security-group" {
     to_port     = 0
     protocol    = "ICMP"
     security_groups = [
-      aws_security_group.app-aws-public-security-group.id,
+      aws_security_group.app-aws-public-ssh-security-group.id,
       aws_security_group.app-aws-private-security-group.id,
     ]
   }
@@ -263,7 +298,7 @@ resource "aws_security_group" "app-aws-private-web-security-group" {
     to_port     = 0
     protocol    = "ICMP"
     security_groups = [
-      aws_security_group.app-aws-public-security-group.id,
+      aws_security_group.app-aws-public-ssh-security-group.id,
       aws_security_group.app-aws-private-security-group.id,
     ]
   }
