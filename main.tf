@@ -1,9 +1,9 @@
 # resource "aws_s3_bucket" "terraform_state" {
 #   bucket = terraform.backend.s3.bucket
 
-#   # lifecycle {
-#   #   prevent_destroy = true
-#   # }
+#   lifecycle {
+#     prevent_destroy = true
+#   }
 
 #   versioning {
 #     enabled = true
@@ -124,6 +124,16 @@ resource "aws_db_subnet_group" "database_server" {
   }
 }
 
+resource "aws_db_parameter_group" "database_server" {
+  name   = var.app_database_server_identifier
+  family = var.app_database_server_family
+
+  parameter {
+    name  = "log_connections"
+    value = "1"
+  }
+}
+
 resource "aws_db_instance" "database_server" {
   identifier             = var.app_database_server_identifier
   instance_class         = var.app_database_server_instance_class
@@ -137,15 +147,5 @@ resource "aws_db_instance" "database_server" {
   parameter_group_name   = aws_db_parameter_group.database_server.name
   publicly_accessible    = var.app_database_server_publicly_accessible
   skip_final_snapshot    = var.app_database_server_skip_final_snapshot
-}
-
-resource "aws_db_parameter_group" "database_server" {
-  name   = var.app_database_server_identifier
-  family = var.app_database_server_family
-
-  parameter {
-    name  = "log_connections"
-    value = "1"
-  }
 }
 
