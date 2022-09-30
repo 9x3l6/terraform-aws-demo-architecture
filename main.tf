@@ -82,6 +82,7 @@ resource "aws_instance" "bastion_host" {
 
   vpc_security_group_ids = [
     module.app_vpc.app_aws_public_ssh_security_group.id,
+    module.app_vpc.app_aws_private_security_group.id,
   ]
 
   tags = {
