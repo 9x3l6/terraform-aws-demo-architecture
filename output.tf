@@ -29,9 +29,23 @@ output "app_bastion_host_instance_public_dns" {
   value       = aws_instance.bastion_host.public_dns
 }
 
+# Private server EC2 instance
+output "app_private_server_instance_id" {
+  description = "ID of the private server instance"
+  value       = aws_instance.private_server.id
+}
+output "app_private_server_instance_private_ip" {
+  description = "Private IP address of the private server instance"
+  value       = aws_instance.private_server.private_ip
+}
+output "app_private_server_instance_private_dns" {
+  description = "Private DNS address of the private server instance"
+  value       = aws_instance.private_server.private_dns
+}
+
 # RDS database server
-output "app_database_hostname" {
-  description = "RDS database instance hostname"
+output "app_database_address" {
+  description = "RDS database instance address"
   value       = aws_db_instance.database_server.address
   sensitive   = true
 }

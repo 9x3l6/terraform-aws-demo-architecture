@@ -7,6 +7,18 @@ terraform init && terraform plan && terraform apply -auto-approve
 terraform init && terraform destroy -auto-approve
 ```
 
+Login to bastion host from anywhere in the world
+
+```sh
+ssh -A ec2-user@<app_bastion_host_instance_public_ip>
+```
+
+Login to private servers from bastion host
+
+```sh
+ssh ec2-user@<app_private_server_instance_private_ip>
+```
+
 I'm looking for a good job with a competitive salary. I talk to many tech recruiters all the time but am still looking for the right team to work with. Yes I say a number for how much I want salary but really I want a number similar to others on the team and one no one else can give me, if possible.
 
 
