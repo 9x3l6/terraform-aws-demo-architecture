@@ -110,7 +110,19 @@ variable "app-aws-database-security-group-ports" {
     protocol = "tcp"
   }
 }
-variable "app-aws-database-security-group-cidr-blocks" {
-  description = "CIDR range to allow for SSH access for connecting to bastion host"
-  default = ["0.0.0.0/0"]
+variable "app-aws-private-web-security-group-name" {
+  description = "Private Web Security Group name"
+  default = "private-web-sg-terraform-demo-architecture"
+}
+variable "app-aws-private-web-security-group-description" {
+  description = "Private Web Security Group description"
+  default = "Private Security Group"
+}
+variable "app-aws-public-web-security-group-name" {
+  description = "Public Web Security Group name"
+  default = "public-web-sg-terraform-demo-architecture"
+}
+variable "app-aws-public-web-security-group-description" {
+  description = "Public Web Security Group description"
+  default = "Public Web Security Group"
 }

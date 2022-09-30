@@ -124,26 +124,6 @@ resource "aws_route_table_association" "app-aws-route-table-association" {
 }
 
 # Security groups
-resource "aws_security_group" "app-aws-private-security-group" {
-  depends_on = [
-    aws_vpc.app-aws-vpc,
-    aws_subnet.app-aws-subnet-private,
-    aws_subnet.app-aws-subnet-public,
-    aws_subnet.app-aws-subnet-database,
-  ]
-
-  vpc_id = aws_vpc.app-aws-vpc.id
-  name = var.app-aws-private-security-group-name  # "private-sg-terraform-demo-architecture"
-  description = var.app-aws-private-security-group-description
-
-  egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 resource "aws_security_group" "app-aws-public-security-group" {
   depends_on = [
     aws_vpc.app-aws-vpc,
@@ -172,7 +152,7 @@ resource "aws_security_group" "app-aws-public-security-group" {
   }
 }
 
-resource "aws_security_group" "app-aws-database-security-group" {
+resource "aws_security_group" "app-aws-private-security-group" {
   depends_on = [
     aws_vpc.app-aws-vpc,
     aws_subnet.app-aws-subnet-private,
@@ -181,15 +161,108 @@ resource "aws_security_group" "app-aws-database-security-group" {
   ]
 
   vpc_id = aws_vpc.app-aws-vpc.id
+  name = var.app-aws-private-security-group-name  # "private-sg-terraform-demo-architecture"
+  description = var.app-aws-private-security-group-description
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# database security group
+resource "aws_security_group" "app-aws-database-security-group" {
+  depends_on = [
+    aws_vpc.app-aws-vpc,
+    aws_subnet.app-aws-subnet-private,
+    aws_subnet.app-aws-subnet-public,
+    aws_subnet.app-aws-subnet-database,
+    aws_security_group.app-aws-private-security-group,
+  ]
+
+  vpc_id = aws_vpc.app-aws-vpc.id
   name = var.app-aws-database-security-group-name  # "database-sg-terraform-demo-architecture"
   description = var.app-aws-database-security-group-description
 
-  # Allow access to database ports
+  # Allow access to database from instances having private security group only
   ingress {
     from_port = var.app-aws-database-security-group-ports.from_port
     to_port = var.app-aws-database-security-group-ports.to_port
     protocol = var.app-aws-database-security-group-ports.protocol
-    cidr_blocks = var.app-aws-database-security-group-cidr-blocks # ["0.0.0.0/0"]
+    security_groups = [aws_security_group.app-aws-private-security-group.id]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# private web security group for private web servers and internal use
+resource "aws_security_group" "app-aws-private-web-security-group" {
+  depends_on = [
+    aws_vpc.app-aws-vpc,
+    aws_subnet.app-aws-subnet-private,
+    aws_subnet.app-aws-subnet-public,
+    aws_subnet.app-aws-subnet-database,
+    aws_security_group.app-aws-private-security-group,
+  ]
+
+  vpc_id = aws_vpc.app-aws-vpc.id
+  name = var.app-aws-private-web-security-group-name  # "private-web-sg-terraform-demo-architecture"
+  description = var.app-aws-private-web-security-group-description
+
+  # Allow access to web servers from anywhere in the world by default
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    security_groups = [aws_security_group.app-aws-private-security-group.id]
+  }
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    security_groups = [aws_security_group.app-aws-private-security-group.id]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# public web security group for public web servers facing the world
+resource "aws_security_group" "app-aws-public-web-security-group" {
+  depends_on = [
+    aws_vpc.app-aws-vpc,
+    aws_subnet.app-aws-subnet-private,
+    aws_subnet.app-aws-subnet-public,
+    aws_subnet.app-aws-subnet-database,
+  ]
+
+  vpc_id = aws_vpc.app-aws-vpc.id
+  name = var.app-aws-public-web-security-group-name  # "public-sg-terraform-demo-architecture"
+  description = var.app-aws-public-web-security-group-description
+
+  # Allow access to web servers from anywhere in the world by default
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
