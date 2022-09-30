@@ -2,10 +2,24 @@
 
 This repo creates all the required resource to run a secure demo application in the AWS cloud to show a specific use case for a test to get a job.
 
+## How to use
+
+### Key pair
+```sh
+ssh-keygen -t rsa -f .terraform-aws-demo-architecture-key-pair
+```
+
+### Destroy
+
 When you're done trying out the technology you can destroy it and you can build it back again with a single command.
 
 ```sh
 terraform init && terraform destroy -auto-approve
+```
+
+### Apply
+
+```sh
 terraform init && terraform plan && terraform apply -auto-approve
 ```
 
@@ -41,6 +55,8 @@ Login to private servers from bastion host
 ```sh
 ssh ec2-user@<app_private_server_instance_private_ip>
 ```
+
+## Work
 
 I'm looking for a good job with a competitive salary. I talk to many tech recruiters all the time but am still looking for the right team to work with. Yes I say a number for how much I want salary but really I want a number similar to others on the team and one no one else can give me, if possible.
 
