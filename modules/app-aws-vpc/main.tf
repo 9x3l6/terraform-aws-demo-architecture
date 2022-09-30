@@ -144,6 +144,14 @@ resource "aws_security_group" "app-aws-public-security-group" {
     cidr_blocks = var.app-aws-public-security-group-cidr-blocks # ["0.0.0.0/0"]
   }
 
+  ingress {
+    description = "Ping"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "ICMP"
+    cidr_blocks = var.app-aws-public-security-group-cidr-blocks # ["0.0.0.0/0"]
+  }
+
   egress {
     from_port = 0
     to_port = 0
@@ -163,6 +171,14 @@ resource "aws_security_group" "app-aws-private-security-group" {
   vpc_id = aws_vpc.app-aws-vpc.id
   name = var.app-aws-private-security-group-name  # "private-sg-terraform-demo-architecture"
   description = var.app-aws-private-security-group-description
+
+  ingress {
+    description = "Ping"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "ICMP"
+    security_groups = [aws_security_group.app-aws-public-security-group.id] # so can ping servers from bastion host
+  }
 
   egress {
     from_port = 0
@@ -192,6 +208,17 @@ resource "aws_security_group" "app-aws-database-security-group" {
     to_port = var.app-aws-database-security-group-ports.to_port
     protocol = var.app-aws-database-security-group-ports.protocol
     security_groups = [aws_security_group.app-aws-private-security-group.id]
+  }
+
+  ingress {
+    description = "Ping"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "ICMP"
+    security_groups = [
+      aws_security_group.app-aws-public-security-group.id,
+      aws_security_group.app-aws-private-security-group.id,
+    ]
   }
 
   egress {
@@ -230,6 +257,17 @@ resource "aws_security_group" "app-aws-private-web-security-group" {
     security_groups = [aws_security_group.app-aws-private-security-group.id]
   }
 
+  ingress {
+    description = "Ping"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "ICMP"
+    security_groups = [
+      aws_security_group.app-aws-public-security-group.id,
+      aws_security_group.app-aws-private-security-group.id,
+    ]
+  }
+
   egress {
     from_port = 0
     to_port = 0
@@ -262,6 +300,14 @@ resource "aws_security_group" "app-aws-public-web-security-group" {
     from_port = 443
     to_port = 443
     protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Ping"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "ICMP"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
