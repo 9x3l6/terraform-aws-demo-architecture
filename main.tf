@@ -34,49 +34,11 @@
 #   }
 # }
 
-
-
 provider "aws" {
   profile = var.aws-profile
   region  = var.aws-region
 }
 
-module "aws-key-pair" {
-  source = "./modules/app-aws-key-pair"
+module "app-vpc" {
+  source = "./modules/app-aws-vpc"
 }
-
-# module "aws-vpc" {
-#   source = "./modules/app-aws-vpc"
-# }
-
-# module "aws-subnets" {
-#   source = "./modules/app-aws-subnets"
-# }
-
-# module "aws-security-groups" {
-#   source = "./modules/app-aws-security-groups"
-# }
-
-# module "aws-igw" {
-#   source = "./modules/app-aws-igw"
-# }
-
-module "aws-route-table" {
-  source = "./modules/app-aws-route-table"
-}
-
-# module "aws-database" {
-#   source = "./modules/app-aws-database"
-# }
-
-# module "aws-lambda-functions" {
-#   source = "./modules/app-aws-lambda-functions"
-# }
-
-# module "aws-public-instances" {
-#   source = "./modules/app-aws-public-instances"
-# }
-
-# module "aws-private-instances" {
-#   source = "./modules/app-aws-private-instances"
-# }
