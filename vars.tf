@@ -74,5 +74,5 @@ variable "app_database_server_password" {
   description = "RDS database server password"
   type = string
   sensitive = true
-  default = "chubby is a good word its like pear shaped"
+  default = "()chubby-is-a-good-word{}its-like-pear-shaped[]"
 }
