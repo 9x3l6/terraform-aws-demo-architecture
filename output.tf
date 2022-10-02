@@ -1,6 +1,6 @@
 output "aws_region" {
   description = "AWS Region"
-  value = var.aws_region
+  value = module.app_vpc.region
 }
 
 # AMI
