@@ -56,10 +56,11 @@ Login to private servers from bastion host
 ssh ec2-user@<app_private_server_instance_private_ip>
 ```
 
-## Work
+## Music
 
-I'm looking for a good job with a competitive salary. I talk to many tech recruiters all the time but am still looking for the right team to work with. Yes I say a number for how much I want salary but really I want a number similar to others on the team and one no one else can give me, if possible.
-
+My friend, please checkout the videos `tellmewhatyoulove` uploaded to youtube if you like good music. Have a great day!
+https://www.youtube.com/watch?v=7l50SSrqHt8
+https://www.youtube.com/channel/UCg4_8m7Dlpi0run1heWvStA/videos
 
 # LICENSE
 

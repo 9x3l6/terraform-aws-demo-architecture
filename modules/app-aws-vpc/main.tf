@@ -3,155 +3,155 @@ data "aws_availability_zones" "available" {
 }
 
 # VPC
-resource "aws_vpc" "app_aws_vpc" {
-  cidr_block              = var.app_aws_vpc_cird_block # "10.42.0.0/16"
+resource "aws_vpc" "vpc" {
+  cidr_block              = var.vpc_cird_block # "10.42.0.0/16"
   enable_dns_support      = "true"
   enable_dns_hostnames    = "true"
 
   tags = {
-    Name = var.app_aws_vpc_name # "terraform-demo-architecture-vpc"
+    Name = var.vpc_name # "terraform-demo-architecture-vpc"
   }
 }
 
 # Subnets
-resource "aws_subnet" "app_aws_subnet_public" {
+resource "aws_subnet" "subnet_public" {
   depends_on = [
-    aws_vpc.app_aws_vpc
+    aws_vpc.vpc
   ]
 
-  vpc_id                  = aws_vpc.app_aws_vpc.id
-  cidr_block              = var.app_aws_subnet_public_cidr_block
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = var.subnet_public_cidr_block
   map_public_ip_on_launch = "true"
   availability_zone       = data.aws_availability_zones.available.names[0]
 
   tags = {
-    Name = var.app_aws_subnet_public_name
+    Name = var.subnet_public_name
   }
 }
 
-resource "aws_subnet" "app_aws_subnet_private" {
+resource "aws_subnet" "subnet_private" {
   depends_on = [
-    aws_vpc.app_aws_vpc,
-    aws_subnet.app_aws_subnet_public,
+    aws_vpc.vpc,
+    aws_subnet.subnet_public,
   ]
 
-  vpc_id            = aws_vpc.app_aws_vpc.id
-  cidr_block        = var.app_aws_subnet_private_cidr_block
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = var.subnet_private_cidr_block
   availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
-    Name = var.app_aws_subnet_private_name
+    Name = var.subnet_private_name
   }
 }
 
-resource "aws_subnet" "app_aws_database_subnet_1" {
+resource "aws_subnet" "database_subnet_1" {
   depends_on = [
-    aws_vpc.app_aws_vpc,
-    aws_subnet.app_aws_subnet_private,
+    aws_vpc.vpc,
+    aws_subnet.subnet_private,
   ]
 
-  vpc_id            = aws_vpc.app_aws_vpc.id
-  cidr_block        = var.app_aws_subnet_database_cidr_blocks[0]
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = var.subnet_database_cidr_blocks[0]
   availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
-    Name = "DBSN-1 ${var.app_aws_subnet_database_name}"
+    Name = "DBSN-1 ${var.subnet_database_name}"
   }
 }
-resource "aws_subnet" "app_aws_database_subnet_2" {
+resource "aws_subnet" "database_subnet_2" {
   depends_on = [
-    aws_vpc.app_aws_vpc,
-    aws_subnet.app_aws_subnet_private,
+    aws_vpc.vpc,
+    aws_subnet.subnet_private,
   ]
 
-  vpc_id            = aws_vpc.app_aws_vpc.id
-  cidr_block        = var.app_aws_subnet_database_cidr_blocks[1]
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = var.subnet_database_cidr_blocks[1]
   availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
-    Name = "DBSN-2 ${var.app_aws_subnet_database_name}"
+    Name = "DBSN-2 ${var.subnet_database_name}"
   }
 }
-resource "aws_subnet" "app_aws_database_subnet_3" {
+resource "aws_subnet" "database_subnet_3" {
   depends_on = [
-    aws_vpc.app_aws_vpc,
-    aws_subnet.app_aws_subnet_private,
+    aws_vpc.vpc,
+    aws_subnet.subnet_private,
   ]
 
-  vpc_id            = aws_vpc.app_aws_vpc.id
-  cidr_block        = var.app_aws_subnet_database_cidr_blocks[2]
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = var.subnet_database_cidr_blocks[2]
   availability_zone = data.aws_availability_zones.available.names[2]
 
   tags = {
-    Name = "DBSN-3 ${var.app_aws_subnet_database_name}"
+    Name = "DBSN-3 ${var.subnet_database_name}"
   }
 }
 
 # Internet gateway
-resource "aws_internet_gateway" "app_aws_internet_gateway" {
+resource "aws_internet_gateway" "internet_gateway" {
   depends_on = [
-    aws_vpc.app_aws_vpc,
-    aws_subnet.app_aws_subnet_public,
-    aws_subnet.app_aws_subnet_private,
-    aws_subnet.app_aws_database_subnet_1,
-    aws_subnet.app_aws_database_subnet_2,
+    aws_vpc.vpc,
+    aws_subnet.subnet_public,
+    aws_subnet.subnet_private,
+    aws_subnet.database_subnet_1,
+    aws_subnet.database_subnet_2,
   ]
 
-  vpc_id = aws_vpc.app_aws_vpc.id
+  vpc_id = aws_vpc.vpc.id
   
   tags = {
-    Name = var.app_aws_internet_gateway_name # "terraform-demo-architecture-igw"
+    Name = var.internet_gateway_name # "terraform-demo-architecture-igw"
   }
 }
 
 # Route table
-resource "aws_route_table" "app_aws_route_table" {
+resource "aws_route_table" "route_table" {
   depends_on = [
-    aws_vpc.app_aws_vpc,
-    aws_internet_gateway.app_aws_internet_gateway,
+    aws_vpc.vpc,
+    aws_internet_gateway.internet_gateway,
   ]
 
-  vpc_id = aws_vpc.app_aws_vpc.id
+  vpc_id = aws_vpc.vpc.id
 
   # NAT
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.app_aws_internet_gateway.id
+    gateway_id = aws_internet_gateway.internet_gateway.id
   }
 
   tags = {
-    Name = var.app_aws_route_table_name
+    Name = var.route_table_name
   }
 }
 
-resource "aws_route_table_association" "app_aws_route_table_association" {
+resource "aws_route_table_association" "route_table_association" {
   depends_on = [
-    aws_vpc.app_aws_vpc,
-    aws_subnet.app_aws_subnet_public,
-    aws_subnet.app_aws_subnet_private,
-    aws_route_table.app_aws_route_table,
-    aws_subnet.app_aws_database_subnet_1,
-    aws_subnet.app_aws_database_subnet_2,
+    aws_vpc.vpc,
+    aws_subnet.subnet_public,
+    aws_subnet.subnet_private,
+    aws_route_table.route_table,
+    aws_subnet.database_subnet_1,
+    aws_subnet.database_subnet_2,
   ]
 
-  subnet_id       = aws_subnet.app_aws_subnet_public.id
-  route_table_id  = aws_route_table.app_aws_route_table.id
+  subnet_id       = aws_subnet.subnet_public.id
+  route_table_id  = aws_route_table.route_table.id
 }
 
 # Security groups
-resource "aws_security_group" "app_aws_public_ssh_security_group" {
+resource "aws_security_group" "public_ssh_security_group" {
   depends_on = [
-    aws_vpc.app_aws_vpc,
-    aws_subnet.app_aws_subnet_public,
-    aws_subnet.app_aws_subnet_private,
-    aws_route_table.app_aws_route_table,
-    aws_subnet.app_aws_database_subnet_1,
-    aws_subnet.app_aws_database_subnet_2,
+    aws_vpc.vpc,
+    aws_subnet.subnet_public,
+    aws_subnet.subnet_private,
+    aws_route_table.route_table,
+    aws_subnet.database_subnet_1,
+    aws_subnet.database_subnet_2,
   ]
 
-  vpc_id = aws_vpc.app_aws_vpc.id
-  name = var.app_aws_public_ssh_security_group_name  # "public-sg-terraform-demo-architecture"
-  description = var.app_aws_public_ssh_security_group_description
+  vpc_id = aws_vpc.vpc.id
+  name = var.public_ssh_security_group_name  # "public-sg-terraform-demo-architecture"
+  description = var.public_ssh_security_group_description
 
   # Allow access to bastion host from anywhere in the world by default
   ingress {
@@ -177,19 +177,19 @@ resource "aws_security_group" "app_aws_public_ssh_security_group" {
   }
 }
 
-resource "aws_security_group" "app_aws_private_ssh_security_group" {
+resource "aws_security_group" "private_ssh_security_group" {
   depends_on = [
-    aws_vpc.app_aws_vpc,
-    aws_subnet.app_aws_subnet_public,
-    aws_subnet.app_aws_subnet_private,
-    aws_route_table.app_aws_route_table,
-    aws_subnet.app_aws_database_subnet_1,
-    aws_subnet.app_aws_database_subnet_2,
+    aws_vpc.vpc,
+    aws_subnet.subnet_public,
+    aws_subnet.subnet_private,
+    aws_route_table.route_table,
+    aws_subnet.database_subnet_1,
+    aws_subnet.database_subnet_2,
   ]
 
-  vpc_id = aws_vpc.app_aws_vpc.id
-  name = var.app_aws_private_ssh_security_group_name  # "private-ssh-sg-terraform-demo-architecture"
-  description = var.app_aws_private_ssh_security_group_description
+  vpc_id = aws_vpc.vpc.id
+  name = var.private_ssh_security_group_name  # "private-ssh-sg-terraform-demo-architecture"
+  description = var.private_ssh_security_group_description
 
   # Allow access to other ssh servers from bastion host
   ingress {
@@ -197,7 +197,7 @@ resource "aws_security_group" "app_aws_private_ssh_security_group" {
     to_port     = 22
     protocol    = "tcp"
     security_groups = [
-      aws_security_group.app_aws_public_ssh_security_group.id,
+      aws_security_group.public_ssh_security_group.id,
     ]
   }
 
@@ -207,7 +207,7 @@ resource "aws_security_group" "app_aws_private_ssh_security_group" {
     to_port     = 0
     protocol    = "ICMP"
     security_groups = [
-      aws_security_group.app_aws_public_ssh_security_group.id,
+      aws_security_group.public_ssh_security_group.id,
     ]
   }
 
@@ -219,26 +219,26 @@ resource "aws_security_group" "app_aws_private_ssh_security_group" {
   }
 }
 
-resource "aws_security_group" "app_aws_private_security_group" {
+resource "aws_security_group" "private_security_group" {
   depends_on = [
-    aws_vpc.app_aws_vpc,
-    aws_subnet.app_aws_subnet_public,
-    aws_subnet.app_aws_subnet_private,
-    aws_route_table.app_aws_route_table,
-    aws_subnet.app_aws_database_subnet_1,
-    aws_subnet.app_aws_database_subnet_2,
+    aws_vpc.vpc,
+    aws_subnet.subnet_public,
+    aws_subnet.subnet_private,
+    aws_route_table.route_table,
+    aws_subnet.database_subnet_1,
+    aws_subnet.database_subnet_2,
   ]
 
-  vpc_id = aws_vpc.app_aws_vpc.id
-  name = var.app_aws_private_security_group_name  # "private-sg-terraform-demo-architecture"
-  description = var.app_aws_private_security_group_description
+  vpc_id = aws_vpc.vpc.id
+  name = var.private_security_group_name  # "private-sg-terraform-demo-architecture"
+  description = var.private_security_group_description
 
   ingress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     security_groups = [
-      aws_security_group.app_aws_public_ssh_security_group.id,
+      aws_security_group.public_ssh_security_group.id,
     ]
   }
 
@@ -251,30 +251,30 @@ resource "aws_security_group" "app_aws_private_security_group" {
 }
 
 # private web security group for private web servers and internal use
-resource "aws_security_group" "app_aws_private_web_security_group" {
+resource "aws_security_group" "private_web_security_group" {
   depends_on = [
-    aws_vpc.app_aws_vpc,
-    aws_subnet.app_aws_subnet_public,
-    aws_subnet.app_aws_subnet_private,
-    aws_route_table.app_aws_route_table,
-    aws_subnet.app_aws_database_subnet_1,
-    aws_subnet.app_aws_database_subnet_2,
-    aws_security_group.app_aws_private_security_group,
+    aws_vpc.vpc,
+    aws_subnet.subnet_public,
+    aws_subnet.subnet_private,
+    aws_route_table.route_table,
+    aws_subnet.database_subnet_1,
+    aws_subnet.database_subnet_2,
+    aws_security_group.private_security_group,
   ]
 
-  vpc_id        = aws_vpc.app_aws_vpc.id
-  name          = var.app_aws_private_web_security_group_name  # "private-web-sg-terraform-demo-architecture"
-  description   = var.app_aws_private_web_security_group_description
+  vpc_id        = aws_vpc.vpc.id
+  name          = var.private_web_security_group_name  # "private-web-sg-terraform-demo-architecture"
+  description   = var.private_web_security_group_description
 
   # Allow access to web servers from anywhere in the world by default
   dynamic "ingress" { 
-    for_each = var.app_aws_private_security_group_ports
+    for_each = var.private_security_group_ports
     content {
       from_port   = ingress.value
       to_port     = ingress.value
       protocol    = "tcp"
       security_groups = [
-        aws_security_group.app_aws_private_security_group.id,
+        aws_security_group.private_security_group.id,
       ]
     }
   }
@@ -285,8 +285,8 @@ resource "aws_security_group" "app_aws_private_web_security_group" {
     to_port     = 0
     protocol    = "ICMP"
     security_groups = [
-      aws_security_group.app_aws_public_ssh_security_group.id,
-      aws_security_group.app_aws_private_security_group.id,
+      aws_security_group.public_ssh_security_group.id,
+      aws_security_group.private_security_group.id,
     ]
   }
 
@@ -299,23 +299,23 @@ resource "aws_security_group" "app_aws_private_web_security_group" {
 }
 
 # public web security group for public web servers facing the world
-resource "aws_security_group" "app_aws_public_web_security_group" {
+resource "aws_security_group" "public_web_security_group" {
   depends_on = [
-    aws_vpc.app_aws_vpc,
-    aws_subnet.app_aws_subnet_public,
-    aws_subnet.app_aws_subnet_private,
-    aws_route_table.app_aws_route_table,
-    aws_subnet.app_aws_database_subnet_1,
-    aws_subnet.app_aws_database_subnet_2,
+    aws_vpc.vpc,
+    aws_subnet.subnet_public,
+    aws_subnet.subnet_private,
+    aws_route_table.route_table,
+    aws_subnet.database_subnet_1,
+    aws_subnet.database_subnet_2,
   ]
 
-  vpc_id        = aws_vpc.app_aws_vpc.id
-  name          = var.app_aws_public_web_security_group_name  # "public-sg-terraform-demo-architecture"
-  description   = var.app_aws_public_web_security_group_description
+  vpc_id        = aws_vpc.vpc.id
+  name          = var.public_web_security_group_name  # "public-sg-terraform-demo-architecture"
+  description   = var.public_web_security_group_description
 
   # Allow access to web servers from anywhere in the world by default
   dynamic "ingress" { 
-    for_each = var.app_aws_public_web_security_group_ports
+    for_each = var.public_web_security_group_ports
     content {
       from_port   = ingress.value
       to_port     = ingress.value
@@ -341,28 +341,28 @@ resource "aws_security_group" "app_aws_public_web_security_group" {
 }
 
 # database security group
-resource "aws_security_group" "app_aws_database_security_group" {
+resource "aws_security_group" "database_security_group" {
   depends_on = [
-    aws_vpc.app_aws_vpc,
-    aws_subnet.app_aws_subnet_public,
-    aws_subnet.app_aws_subnet_private,
-    aws_route_table.app_aws_route_table,
-    aws_subnet.app_aws_database_subnet_1,
-    aws_subnet.app_aws_database_subnet_2,
-    aws_security_group.app_aws_private_security_group,
+    aws_vpc.vpc,
+    aws_subnet.subnet_public,
+    aws_subnet.subnet_private,
+    aws_route_table.route_table,
+    aws_subnet.database_subnet_1,
+    aws_subnet.database_subnet_2,
+    aws_security_group.private_security_group,
   ]
 
-  vpc_id        = aws_vpc.app_aws_vpc.id
-  name          = var.app_aws_database_security_group_name  # "database-sg-terraform-demo-architecture"
-  description   = var.app_aws_database_security_group_description
+  vpc_id        = aws_vpc.vpc.id
+  name          = var.database_security_group_name  # "database-sg-terraform-demo-architecture"
+  description   = var.database_security_group_description
 
   # Allow access to database from instances having private security group only
   ingress {
-    from_port   = var.app_aws_database_security_group_ports.from_port
-    to_port     = var.app_aws_database_security_group_ports.to_port
-    protocol    = var.app_aws_database_security_group_ports.protocol
+    from_port   = var.database_security_group_ports.from_port
+    to_port     = var.database_security_group_ports.to_port
+    protocol    = var.database_security_group_ports.protocol
     security_groups = [
-      aws_security_group.app_aws_private_security_group.id,
+      aws_security_group.private_security_group.id,
     ]
   }
 
@@ -372,8 +372,8 @@ resource "aws_security_group" "app_aws_database_security_group" {
     to_port     = 0
     protocol    = "ICMP"
     security_groups = [
-      aws_security_group.app_aws_public_ssh_security_group.id,
-      aws_security_group.app_aws_private_security_group.id,
+      aws_security_group.public_ssh_security_group.id,
+      aws_security_group.private_security_group.id,
     ]
   }
 
@@ -382,5 +382,286 @@ resource "aws_security_group" "app_aws_database_security_group" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_key_pair" "ssh_key_pair" {
+  key_name    = var.ssh_key_name
+  public_key  = file(var.ssh_public_key_path)  
+}
+
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-2.0*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+
+  owners = ["amazon"]
+}
+
+resource "aws_instance" "bastion_host" {
+  depends_on = [
+    aws_vpc.vpc,
+  ]
+  
+  instance_type = var.bastion_host_instance_type
+  ami           = data.aws_ami.amazon_linux.id
+  subnet_id     = aws_subnet.subnet_public.id
+  key_name      = var.ssh_key_name
+
+  vpc_security_group_ids = [
+    aws_security_group.public_ssh_security_group.id,
+    aws_security_group.private_security_group.id,
+    aws_security_group.private_web_security_group.id,
+    aws_security_group.private_ssh_security_group.id,
+  ]
+
+  tags = {
+    Name = var.bastion_host_name
+  }
+}
+
+resource "aws_instance" "private_server" {
+  depends_on = [
+    aws_vpc.vpc,
+  ]
+  
+  count = length(var.private_server_names)
+
+  instance_type = var.private_server_instance_type
+  ami           = data.aws_ami.amazon_linux.id
+  subnet_id     = aws_subnet.subnet_private.id
+  key_name      = var.ssh_key_name
+
+  vpc_security_group_ids = [
+    aws_security_group.private_security_group.id,
+    aws_security_group.private_web_security_group.id,
+    aws_security_group.private_ssh_security_group.id,
+  ]
+
+  tags = {
+    Name = var.private_server_names[count.index]
+  }
+}
+
+# RDS database
+resource "aws_db_subnet_group" "database_server" {
+  name       = var.database_server_identifier
+  subnet_ids = [
+    aws_subnet.database_subnet_1.id,
+    aws_subnet.database_subnet_2.id,
+    aws_subnet.database_subnet_3.id,
+  ]
+
+  tags = {
+    Name = var.database_subnet_group_name
+  }
+}
+
+resource "aws_db_parameter_group" "database_server" {
+  name   = var.database_server_identifier
+  family = var.database_server_family
+
+  parameter {
+    name  = "log_connections"
+    value = "1"
+  }
+}
+
+resource "aws_db_instance" "database_server" {
+  identifier             = var.database_server_identifier
+  instance_class         = var.database_server_instance_class
+  allocated_storage      = var.database_server_allocated_storage
+  engine                 = var.database_server_engine
+  engine_version         = var.database_server_engine_version
+  username               = var.database_server_username
+  password               = var.database_server_password
+  db_subnet_group_name   = aws_db_subnet_group.database_server.name
+  vpc_security_group_ids = [aws_security_group.database_security_group.id]
+  parameter_group_name   = aws_db_parameter_group.database_server.name
+  publicly_accessible    = var.database_server_publicly_accessible
+  skip_final_snapshot    = var.database_server_skip_final_snapshot
+}
+
+# CloudWatch rules & lambda permissions
+# start every_day_8am
+resource "aws_cloudwatch_event_rule" "every_day_8am" {
+  name                = "every_day_8am"
+  description         = "Fires every day 8AM"
+  schedule_expression = "cron(0 8 * * ? *)"
+}
+resource "aws_lambda_permission" "allow_cloudwatch_every_day_8am_lambda_start_ec2_instances" {
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = "${aws_lambda_function.lambda_start_ec2_instances.function_name}"
+  principal     = "events.amazonaws.com"
+  source_arn    = "${aws_cloudwatch_event_rule.every_day_8am.arn}"
+}
+resource "aws_cloudwatch_event_target" "lambda_start_ec2_instances_every_day_8am" {
+  rule      = "${aws_cloudwatch_event_rule.every_day_8am.name}"
+  target_id = "lambda"
+  arn       = "${aws_lambda_function.lambda_start_ec2_instances.arn}"
+}
+
+# stop every_day_6pm
+resource "aws_cloudwatch_event_rule" "every_day_6pm" {
+  name                = "every_day_6pm"
+  description         = "Fires every day 6PM"
+  schedule_expression = "cron(0 18 * * ? *)"
+}
+resource "aws_lambda_permission" "allow_cloudwatch_every_day_6pm_lambda_stop_ec2_instances" {
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = "${aws_lambda_function.lambda_stop_ec2_instances.function_name}"
+  principal     = "events.amazonaws.com"
+  source_arn    = "${aws_cloudwatch_event_rule.every_day_6pm.arn}"
+}
+resource "aws_cloudwatch_event_target" "lambda_stop_ec2_instances_every_day_6pm" {
+  rule      = "${aws_cloudwatch_event_rule.every_day_6pm.name}"
+  target_id = "lambda"
+  arn       = "${aws_lambda_function.lambda_stop_ec2_instances.arn}"
+}
+
+# # start weekdays_8am
+# resource "aws_cloudwatch_event_rule" "weekdays_8am" {
+#   name                = "weekdays_8am"
+#   description         = "Fires on the weekdays 8AM"
+#   schedule_expression = "cron(0 8 * * MON-FRI *)"
+# }
+# resource "aws_lambda_permission" "allow_cloudwatch_weekdays_8am_lambda_start_ec2_instances" {
+#   statement_id  = "AllowExecutionFromCloudWatch"
+#   action        = "lambda:InvokeFunction"
+#   function_name = "${aws_lambda_function.lambda_start_ec2_instances.function_name}"
+#   principal     = "events.amazonaws.com"
+#   source_arn    = "${aws_cloudwatch_event_rule.weekdays_8am.arn}"
+# }
+# resource "aws_cloudwatch_event_target" "lambda_start_ec2_instances_weekdays_8am" {
+#   rule      = "${aws_cloudwatch_event_rule.weekdays_8am.name}"
+#   target_id = "lambda"
+#   arn       = "${aws_lambda_function.lambda_start_ec2_instances.arn}"
+# }
+
+# # stop weekdays_6pm
+# resource "aws_cloudwatch_event_rule" "weekdays_6pm" {
+#   name                = "weeksdays_6pm"
+#   description         = "Fires on the weekdays 6PM"
+#   schedule_expression = "cron(0 18 * * MON-FRI *)"
+# }
+# resource "aws_lambda_permission" "allow_cloudwatch_weekdays_6pm_lambda_stop_ec2_instances" {
+#   statement_id  = "AllowExecutionFromCloudWatch"
+#   action        = "lambda:InvokeFunction"
+#   function_name = "${aws_lambda_function.lambda_stop_ec2_instances.function_name}"
+#   principal     = "events.amazonaws.com"
+#   source_arn    = "${aws_cloudwatch_event_rule.weekdays_6pm.arn}"
+# }
+# resource "aws_cloudwatch_event_target" "lambda_stop_ec2_instances_weekdays_6pm" {
+#   rule      = "${aws_cloudwatch_event_rule.weekdays_6pm.name}"
+#   target_id = "lambda"
+#   arn       = "${aws_lambda_function.lambda_stop_ec2_instances.arn}"
+# }
+
+# archive file
+data "archive_file" "zip_the_code" {
+  type        = "zip"
+  source_dir  = "${path.module}/../../${var.archive_file_source_dir}"
+  output_path = "${path.module}/../../${var.archive_file_output_path}"
+}
+
+resource "aws_iam_role" "iam_for_lambda" {
+  name = "iam_for_lambda"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda" {
+  name         = "aws_iam_policy_for_terraform_aws_lambda_role"
+  path         = "/"
+  description  = "AWS IAM Policy for managing aws lambda role"
+  policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": [
+       "logs:CreateLogGroup",
+       "logs:CreateLogStream",
+       "logs:PutLogEvents"
+     ],
+     "Resource": "arn:aws:logs:*:*:*",
+     "Effect": "Allow"
+   },
+   {
+      "Action": [
+        "ec2:Start*",
+        "ec2:Stop*"
+      ],
+      "Resource": "*",
+      "Effect": "Allow"
+    }
+ ]
+}
+EOF
+}
+ 
+resource "aws_iam_role_policy_attachment" "attach_iam_policy_to_iam_role" {
+  role        = aws_iam_role.iam_for_lambda.name
+  policy_arn  = aws_iam_policy.iam_policy_for_lambda.arn
+}
+
+# Lambda functions
+resource "aws_lambda_function" "lambda_start_ec2_instances" {
+  filename      = "${path.module}/../../${var.archive_file_output_path}"
+  function_name = "start_ec2_instances"
+  role          = aws_iam_role.iam_for_lambda.arn
+  handler       = var.lambda_function_handler
+  runtime       = var.lambda_function_runtime
+  depends_on    = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
+
+  environment {
+    variables = {
+      action = "start"
+      instances = join(",", aws_instance.private_server[*].id)
+    }
+  }
+}
+resource "aws_lambda_function" "lambda_stop_ec2_instances" {
+  filename      = "${path.module}/../../${var.archive_file_output_path}"
+  function_name = "stop_ec2_instances"
+  role          = aws_iam_role.iam_for_lambda.arn
+  handler       = var.lambda_function_handler
+  runtime       = var.lambda_function_runtime
+  depends_on    = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
+
+  environment {
+    variables = {
+      action = "stop"
+      instances = join(",", aws_instance.private_server[*].id)
+    }
   }
 }
