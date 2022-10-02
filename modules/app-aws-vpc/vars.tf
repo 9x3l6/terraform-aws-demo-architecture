@@ -162,16 +162,12 @@ variable "bastion_host_instance_type" {
 # }
 variable "private_server_names" {
   description = "Names of private servers"
-  default = ["private-server-1"]
+  default = ["private-server-1-for-demo-architecture"]
   type = list(string)
 }
 variable "private_server_instance_type" {
   description = "Instance type for private server"
   default = "t2.micro"
-}
-variable "private_server_count" {
-  description = "Count amount of private server"
-  default = 1
 }
 
 # Database
