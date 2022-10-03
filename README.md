@@ -26,22 +26,22 @@ terraform init && terraform plan && terraform apply -auto-approve
 Running the command above should create the infrastructure and output connection details similar to this
 
 ```
-Apply complete! Resources: 21 added, 0 changed, 0 destroyed.
+Apply complete! Resources: 32 added, 0 changed, 0 destroyed.
 
 Outputs:
 
-app_amazon_linux_id = "ami-0464d49b8794eba32"
-app_aws_region = "us-east-1"
-app_bastion_host_instance_id = "i-05bce4347aa0e990b"
-app_bastion_host_instance_public_dns = "ec2-3-85-38-94.compute-1.amazonaws.com"
-app_bastion_host_instance_public_ip = "3.85.38.94"
-app_database_address = <sensitive>
-app_database_port = 5432
-app_database_username = <sensitive>
-app_private_server_instance_id = "i-0d02139cb16ce9495"
-app_private_server_instance_private_dns = "ip-10-42-2-146.ec2.internal"
-app_private_server_instance_private_ip = "10.42.2.146"
-app_ssh_key_pair_name = "terraform-aws-demo-architecture"
+amazon_linux_id = "ami-0464d49b8794eba32"
+aws_region = "us-east-1"
+bastion_host_instance_id = "i-04a0dc500549378e8"
+bastion_host_instance_public_ip = "54.156.94.240"
+database_address = <sensitive>
+private_server_instances_id = [
+  "i-07c8c2cf12e7a6bcb",
+]
+private_server_instances_private_ip = [
+  "10.42.2.254",
+]
+ssh_key_pair_name = "terraform-aws-demo-architecture"
 ```
 
 Login to bastion host from anywhere in the world
