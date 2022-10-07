@@ -2,30 +2,51 @@
 
 This repo creates all the required resource to run a secure demo application in the AWS cloud to show a specific use case for a test to get a job.
 
+### KEY PAIR
+
+![Key Pair](./screenshots/key-pair.png)
+
+### VPC
+
+![VPC](./screenshots/vpc.png)
+
+### Subnets
+
+![Subnets](./screenshots/subnets.png)
+
+### Route tables
+
+![Route tables](./screenshots/route-tables.png)
+
+### Internet gateways
+
+![Route tables](./screenshots/internet-gateways.png)
+
+### Security groups
+
+![Security groups](./screenshots/security-groups.png)
+
 ### EC2
 
 ![EC2 Instances](./screenshots/ec2.png)
-
-- EC2 Instances that are created for this demo
 
 ### RDS
 
 ![RDS Database](./screenshots/rds.png)
 
-- The RDS Database that is created for this demo
-
 ### Lambda
 
 ![Lambda Functions](./screenshots/lambda.png)
 
-- The Lambda Functions that are created for this demo
-
 ## How to use
 
 ### Key pair
+
 ```sh
 ssh-keygen -t rsa -f .terraform-aws-demo-architecture-key-pair
 ```
+
+You'll want to forward ssh-agent when connecting to the bastion host. First add the key to ssh-agent `ssh-add .terraform-aws-demo-architecture-key-pair` and connect using `ssh -T ec2-user@<bastion_host_instance_public_ip>`. From there you can ssh into the private instaces without having to copy the key pair onto the bastion host. This is good security practice.
 
 ### Destroy
 
