@@ -2,6 +2,24 @@
 
 This repo creates all the required resource to run a secure demo application in the AWS cloud to show a specific use case for a test to get a job.
 
+### EC2
+
+![EC2 Instances](./screenshots/ec2.png)
+
+- EC2 Instances that are created for this demo
+
+### RDS
+
+![RDS Database](./screenshots/rds.png)
+
+- The RDS Database that is created for this demo
+
+### Lambda
+
+![Lambda Functions](./screenshots/lambda.png)
+
+- The Lambda Functions that are created for this demo
+
 ## How to use
 
 ### Key pair

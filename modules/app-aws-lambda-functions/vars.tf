@@ -17,6 +17,6 @@ variable "lambda_function_runtime" {
   default = "python3.8"
 }
 variable "lambda_function_handler" {
-  description = "Lambda function handler"
-  default = "index.lambda_handler"
+  description = "Lambda function handler to start/stop intsances"
+  default = "ec2.start_stop_instances"
 }
